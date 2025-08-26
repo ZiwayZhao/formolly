@@ -6,7 +6,7 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-const openrouterApiKey = Deno.env.get('OPENROUTER_API_KEY');
+const openaiApiKey = Deno.env.get('OPENAI_API_KEY');
 
 serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders });
@@ -20,17 +20,15 @@ serve(async (req) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
     );
 
-    // 1. 生成查询向量 (使用OpenRouter)
-    const embeddingResponse = await fetch('https://openrouter.ai/api/v1/embeddings', {
+    // 1. 生成查询向量 (使用OpenAI)
+    const embeddingResponse = await fetch('https://api.openai.com/v1/embeddings', {
       method: 'POST',
       headers: { 
-        'Authorization': `Bearer ${openrouterApiKey}`, 
-        'Content-Type': 'application/json',
-        'HTTP-Referer': 'https://formolly.app',
-        'X-Title': 'Formolly Travel Assistant'
+        'Authorization': `Bearer ${openaiApiKey}`, 
+        'Content-Type': 'application/json'
       },
       body: JSON.stringify({ 
-        model: 'openai/text-embedding-ada-002', 
+        model: 'text-embedding-ada-002', 
         input: message 
       }),
     });
@@ -105,17 +103,15 @@ Molly的问题：${message}
 请以Ziway的身份，基于知识库内容为Molly提供详细、实用的回答：
 `;
 
-    // 5. 调用OpenRouter生成回答 (使用GPT-4o)
-    const chatResponse = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+    // 5. 调用OpenAI生成回答
+    const chatResponse = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: { 
-        'Authorization': `Bearer ${openrouterApiKey}`, 
-        'Content-Type': 'application/json',
-        'HTTP-Referer': 'https://formolly.app',
-        'X-Title': 'Formolly Travel Assistant'
+        'Authorization': `Bearer ${openaiApiKey}`, 
+        'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        model: 'openai/gpt-4o',
+        model: 'gpt-4o',
         messages: [
           { role: 'system', content: systemPrompt },
           { role: 'user', content: userPrompt }

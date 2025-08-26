@@ -6,7 +6,7 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-const openrouterApiKey = Deno.env.get('OPENROUTER_API_KEY');
+const openaiApiKey = Deno.env.get('OPENAI_API_KEY');
 
 serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders });
@@ -106,17 +106,15 @@ Molly的问题：${message}
 请以Ziway的身份，为Molly提供详细、实用的回答：
 `;
 
-    // 调用OpenRouter生成回答
-    const chatResponse = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+    // 调用OpenAI生成回答
+    const chatResponse = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: { 
-        'Authorization': `Bearer ${openrouterApiKey}`, 
-        'Content-Type': 'application/json',
-        'HTTP-Referer': 'https://formolly.app',
-        'X-Title': 'Formolly Travel Assistant'
+        'Authorization': `Bearer ${openaiApiKey}`, 
+        'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        model: 'openai/gpt-4o',
+        model: 'gpt-4o',
         messages: [
           { role: 'system', content: systemPrompt },
           { role: 'user', content: userPrompt }
@@ -128,7 +126,7 @@ Molly的问题：${message}
 
     if (!chatResponse.ok) {
       const errorText = await chatResponse.text();
-      throw new Error(`OpenRouter API error: ${chatResponse.status} - ${errorText}`);
+      throw new Error(`OpenAI API error: ${chatResponse.status} - ${errorText}`);
     }
     
     const chatData = await chatResponse.json();

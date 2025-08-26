@@ -145,13 +145,6 @@ export default function ZiwayChat({ className = '' }: ZiwayChatProps) {
     ]);
   };
 
-  const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault();
-      sendMessage();
-    }
-  };
-
   const formatMessageContent = (content: string) => {
     return content.split('\n').map((line, index) => (
       <React.Fragment key={index}>
